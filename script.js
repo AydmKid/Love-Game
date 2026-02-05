@@ -1,175 +1,108 @@
-    :root {
-  --bg1: #ffd6e7;
-  --bg2: #ffeedd;
-  --card: #ffffff;
-  --text: #2f1f26;
-  --yes: #35c759;
-  --no: #ff3b30;
-}
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const message = document.getElementById("message");
+const nameBackground = document.getElementById("nameBackground");
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: Tahoma, Arial, sans-serif;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--bg1), var(--bg2));
-  color: var(--text);
-  overflow: hidden;
-}
-
-.name-background {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.floating-name {
-  position: absolute;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: rgba(233, 30, 99, 0.42);
-  text-shadow: 0 0 16px rgba(233, 30, 99, 0.3);
-  white-space: nowrap;
-  animation-name: driftName, pulseName;
-  animation-timing-function: ease-in-out, ease-in-out;
-  animation-iteration-count: infinite, infinite;
-}
-
-.card {
-  width: min(90vw, 420px);
-  background: var(--card);
-  border-radius: 22px;
-  padding: 28px 20px 24px;
-  text-align: center;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.15);
-  position: relative;
-  z-index: 10;
-}
-
-h1 {
-  margin: 0;
-  font-size: 2rem;
-}
-
-.hint {
-  margin: 10px 0 18px;
-  opacity: 0.8;
-}
-
-.buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  min-height: 56px;
-  position: relative;
-}
-
-.btn {
-  border: 0;
-  border-radius: 999px;
-  padding: 12px 28px;
-  font-size: 1rem;
-  color: #fff;
-  cursor: pointer;
-  transition: transform 0.18s ease;
-  user-select: none;
-}
-
-.btn:hover {
-  transform: scale(1.06);
-}
-
-.yes {
-  background: var(--yes);
-}
-
-.no {
-  background: var(--no);
-}
-
-.no:hover {
-  transform: scale(1.06);
-}
-
-.message {
-  margin-top: 18px;
-  min-height: 26px;
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.message-show {
-  animation: popIn 420ms ease;
-  color: #e91e63;
-  text-shadow: 0 0 10px rgba(233, 30, 99, 0.25);
-}
-
-.heart-pop {
-  position: fixed;
-  z-index: 1200;
-  pointer-events: none;
-  color: #ff2d55;
-  text-shadow: 0 4px 12px rgba(255, 45, 85, 0.35);
-  animation-name: floatHeart;
-  animation-timing-function: ease-out;
-  animation-fill-mode: forwards;
-}
-
-@keyframes popIn {
-  0% {
-    opacity: 0;
-    transform: translateY(6px) scale(0.8);
+function createNameBackground() {
+  if (!nameBackground) {
+    return;
   }
-  70% {
-    opacity: 1;
-    transform: translateY(-1px) scale(1.06);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+
+  nameBackground.innerHTML = "";
+
+  const names = ["Abrar", "Tekno"];
+  const totalNames = 26;
+
+  for (let i = 0; i < totalNames; i += 1) {
+    const name = document.createElement("span");
+    name.className = "floating-name";
+    name.textContent = names[i % names.length];
+
+    const left = Math.random() * 94;
+    const top = Math.random() * 92;
+    const fontSize = 18 + Math.random() * 34;
+    const driftDuration = 3800 + Math.random() * 4200;
+    const pulseDuration = 1800 + Math.random() * 2400;
+    const delay = Math.random() * 3000;
+
+    name.style.left = `${left}%`;
+    name.style.top = `${top}%`;
+    name.style.fontSize = `${fontSize}px`;
+    name.style.animationDuration = `${driftDuration}ms, ${pulseDuration}ms`;
+    name.style.animationDelay = `${delay}ms, ${delay / 2}ms`;
+
+    nameBackground.appendChild(name);
   }
 }
 
-@keyframes floatHeart {
-  0% {
-    opacity: 0.95;
-    transform: translate(0, 0) scale(0.7);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--drift-x), var(--drift-y)) scale(1.25);
+function moveNoButton() {
+  noBtn.style.position = "fixed";
+  noBtn.style.zIndex = "999";
+
+  const margin = 10;
+  const maxX = window.innerWidth - noBtn.offsetWidth - margin;
+  const maxY = window.innerHeight - noBtn.offsetHeight - margin;
+  const x = Math.max(margin, Math.floor(Math.random() * maxX));
+  const y = Math.max(margin, Math.floor(Math.random() * maxY));
+
+  noBtn.style.left = `${x}px`;
+  noBtn.style.top = `${y}px`;
+}
+
+function isPointerClose(event) {
+  const rect = noBtn.getBoundingClientRect();
+  const buttonCenterX = rect.left + rect.width / 2;
+  const buttonCenterY = rect.top + rect.height / 2;
+  const dx = event.clientX - buttonCenterX;
+  const dy = event.clientY - buttonCenterY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  return distance < 10;
+}
+
+function launchHearts(originX, originY) {
+  for (let i = 0; i < 14; i += 1) {
+    const heart = document.createElement("span");
+    heart.className = "heart-pop";
+    heart.textContent = "❤";
+
+    const size = 16 + Math.random() * 18;
+    const driftX = -90 + Math.random() * 180;
+    const driftY = -120 - Math.random() * 140;
+    const duration = 900 + Math.random() * 700;
+
+    heart.style.left = `${originX}px`;
+    heart.style.top = `${originY}px`;
+    heart.style.fontSize = `${size}px`;
+    heart.style.setProperty("--drift-x", `${driftX}px`);
+    heart.style.setProperty("--drift-y", `${driftY}px`);
+    heart.style.animationDuration = `${duration}ms`;
+
+    document.body.appendChild(heart);
+    heart.addEventListener("animationend", () => heart.remove());
   }
 }
 
-@keyframes driftName {
-  0% {
-    transform: translate3d(0, 0, 0) rotate(-3deg);
-  }
-  50% {
-    transform: translate3d(0, -24px, 0) rotate(3deg);
-  }
-  100% {
-    transform: translate3d(0, 0, 0) rotate(-3deg);
-  }
-}
+yesBtn.addEventListener("click", () => {
+  const rect = yesBtn.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
 
-@keyframes pulseName {
-  0% {
-    opacity: 0.4;
-    filter: blur(0px);
+  message.textContent = "! 💖 Love you too";
+  message.classList.remove("message-show");
+  void message.offsetWidth;
+  message.classList.add("message-show");
+
+  launchHearts(centerX, centerY);
+});
+
+noBtn.addEventListener("mouseenter", moveNoButton);
+
+document.addEventListener("mousemove", (event) => {
+  if (isPointerClose(event)) {
+    moveNoButton();
   }
-  50% {
-    opacity: 0.8;
-    filter: blur(0.4px);
-  }
-  100% {
-    opacity: 0.4;
-    filter: blur(0px);
-  }
-}
+});
+
+window.addEventListener("resize", moveNoButton);
+createNameBackground();
+window.addEventListener("load", createNameBackground);
